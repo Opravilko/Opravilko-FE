@@ -1,6 +1,6 @@
 // components/Navbar.js
 import React from 'react';
-import { View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 import IconSettings from '../assets/icons/IconSettings';
@@ -12,47 +12,32 @@ import IconProfile from '../assets/icons/IconProfile';
 // icon dimensions
 const iconWidth = 32;
 const iconHeight = 32;
+// icon colors
+const defaultColor = "#000000";
+const activeColor = "#01BAEF";
 
 const Navbar = () => {
   const navigation = useNavigation();
 
+  // get current screen/tab
+  const currentScreen = navigation.getCurrentRoute()?.name || "Home"
+
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10 }}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-        <SvgXml
-            width={iconWidth}
-            height={iconHeight}
-            xml={IconSettings}
-            color={"#ff0000"}
-        />
+            <IconSettings width={iconWidth} height={iconHeight} stroke={currentScreen == "Settings" ? activeColor : defaultColor}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Messages')}>
-        <SvgXml
-            width={iconWidth}
-            height={iconHeight}
-            xml={IconMessages}
-        />
+            <IconMessages width={iconWidth} height={iconHeight} stroke={currentScreen == "Messages" ? activeColor : defaultColor}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-        <SvgXml
-            width={iconWidth}
-            height={iconHeight}
-            xml={IconTasks}
-        />
+            <IconTasks width={iconWidth} height={iconHeight} stroke={currentScreen == "Home" ? activeColor : defaultColor}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Points')}>
-        <SvgXml
-            width={iconWidth}
-            height={iconHeight}
-            xml={IconPoints}
-        />
+            <IconPoints width={iconWidth} height={iconHeight} stroke={currentScreen == "Points" ? activeColor : defaultColor}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-        <SvgXml
-            width={iconWidth}
-            height={iconHeight}
-            xml={IconProfile}
-        />
+            <IconProfile width={iconWidth} height={iconHeight} stroke={currentScreen == "Profile" ? activeColor : defaultColor}/>
         </TouchableOpacity>
     </View>
   );

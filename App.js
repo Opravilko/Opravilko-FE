@@ -19,7 +19,7 @@ const App = () => {
         <Tab.Screen name="Profile" component={ProfileScreen} />
         <Tab.Screen name="Messages" component={MessagesScreen} />
         <Tab.Screen name="Points" component={PointScreen} />
-        <Tab.Screen name="LogIn/Edit Profile" component={LogInEditProfileScreen} />
+        <Tab.Screen name="Settings" component={LogInEditProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

@@ -1,6 +1,6 @@
 // screens/HomeScreen.js
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, Alert, ScrollView } from 'react-native';
+import { View, Text, Button, TextInput, Alert, ScrollView, ToastAndroid } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import accentColor from '../assets/colorSchema';
 import CustomButton from '../components/CustomButton'
@@ -42,6 +42,7 @@ const HomeScreen = () => {
     const [selectedDateDisplay, setSelectedDateDisplay] = useState(todayDateDisplay());
     const [activity, setActivity] = useState('');
     const [activities, setActivities] = useState({});
+    const [markedDates, setMarkedDates] = useState({})
 
     const handleDateSelect = (date) => {
         const formattedDate = `${date.day}. ${date.month}. ${date.year}`;
@@ -65,6 +66,10 @@ const HomeScreen = () => {
         newActivities[selectedDate].push(activity);
         setActivities(newActivities);
         setActivity('');
+
+        // add dot on calendar
+        const newMarkedDates = { ...markedDates, [selectedDate]: { marked: true, dotColor: accentColor }}
+        setMarkedDates(newMarkedDates);
     };
 
     const handleDeleteActivity = (date, index) => {
@@ -72,8 +77,31 @@ const HomeScreen = () => {
         newActivities[date].splice(index, 1);
         if (newActivities[date].length === 0) {
             delete newActivities[date];
+
+            const newMarkedDates = { ...markedDates }
+            delete newMarkedDates[date]
+            setMarkedDates(newMarkedDates)
         }
         setActivities(newActivities);
+
+        ToastAndroid.show("Activity deleted", ToastAndroid.SHORT)
+    };
+
+    const handleCompleteActivity = (date, index) => {
+        const newActivities = { ...activities };
+        newActivities[date].splice(index, 1);
+        if (newActivities[date].length === 0) {
+            delete newActivities[date];
+            
+            const newMarkedDates = { ...markedDates }
+            delete newMarkedDates[date]
+            setMarkedDates(newMarkedDates)
+        }
+        setActivities(newActivities);
+
+        // TODO add points (API)
+
+        ToastAndroid.show("🎉 Activity completed 🎉", ToastAndroid.SHORT)
     };
 
     // returns a number (0-6) representing the day of the week
@@ -89,7 +117,10 @@ const HomeScreen = () => {
         <View style={{ flex: 1, padding: 20, marginTop: 10 }}>
             <Calendar
                 onDayPress={handleDateSelect}
-                markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: accentColor } }}
+                markedDates={{
+                    ...markedDates,
+                    [selectedDate]: { selected: true, marked: true, selectedColor: accentColor },
+                }}
             />
             <Text style={{ marginTop: 20 }}>Selected Date: {selectedDateDisplay}</Text>
             <TextInput
@@ -97,7 +128,7 @@ const HomeScreen = () => {
                 value={activity}
                 onChangeText={setActivity}
                 maxLength={30}
-                style={{ borderWidth: 1, borderColor: 'gray', padding: 10, marginTop: 10 }}
+                style={{ borderWidth: 1, borderColor: 'gray', padding: 10, marginTop: 10, borderRadius: 7, backgroundColor: "white" }}
             />
             <CustomButton title="Add Activity" onPress={handleAddActivity}/>
             {activities[selectedDate] && (
@@ -109,7 +140,7 @@ const HomeScreen = () => {
                         <View style={{ flexDirection: 'row' }}>
                             <CustomButton
                                 title="complete"
-                                //onPress={() => handleDeleteActivity(selectedDate, index)}
+                                onPress={() => handleCompleteActivity(selectedDate, index)}
                                 style={{ marginRight: 5, marginLeft: 5 }}
                             >
                                 <IconThumbsup width="25" height="25" stroke="white"/>

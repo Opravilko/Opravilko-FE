@@ -18,8 +18,28 @@ LocaleConfig.locales['en'] = {
 LocaleConfig.defaultLocale = 'en';
 
 const HomeScreen = () => {
-    const [selectedDate, setSelectedDate] = useState('');
-    const [selectedDateDisplay, setSelectedDateDisplay] = useState('');
+    const todayDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let day = today.getDate();
+        month = month < 10 ? '0' + month : month;
+        day = day < 10 ? '0' + day : day;
+        
+        return `${year}-${month}-${day}`;
+    };
+
+    const todayDateDisplay = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let day = today.getDate();
+
+        return `${day}. ${month}. ${year}`;
+    }
+
+    const [selectedDate, setSelectedDate] = useState(todayDate());
+    const [selectedDateDisplay, setSelectedDateDisplay] = useState(todayDateDisplay());
     const [activity, setActivity] = useState('');
     const [activities, setActivities] = useState({});
 

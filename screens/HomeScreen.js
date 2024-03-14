@@ -96,6 +96,7 @@ const HomeScreen = () => {
                 placeholder="Take out the trash"
                 value={activity}
                 onChangeText={setActivity}
+                maxLength={30}
                 style={{ borderWidth: 1, borderColor: 'gray', padding: 10, marginTop: 10 }}
             />
             <CustomButton title="Add Activity" onPress={handleAddActivity}/>
@@ -103,21 +104,23 @@ const HomeScreen = () => {
                 <ScrollView style={{ marginTop: 20 }}>
                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Activities for {getDayOfWeek(selectedDate)}:</Text>
                 {activities[selectedDate].map((item, index) => (
-                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                    <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
                         <Text>{item}</Text>
-                        <CustomButton
-                            title="complete"
-                            //onPress={() => handleDeleteActivity(selectedDate, index)}
-                            style={{ marginRight: 5, marginLeft: 5 }}
-                        >
-                            <IconThumbsup width="25" height="25" stroke="white"/>
-                        </CustomButton>
-                        <CustomButton
-                            title="Delete"
-                            onPress={() => handleDeleteActivity(selectedDate, index)}
-                        >
-                            <IconTrash width="25" height="25" stroke="white"/>
-                        </CustomButton>
+                        <View style={{ flexDirection: 'row' }}>
+                            <CustomButton
+                                title="complete"
+                                //onPress={() => handleDeleteActivity(selectedDate, index)}
+                                style={{ marginRight: 5, marginLeft: 5 }}
+                            >
+                                <IconThumbsup width="25" height="25" stroke="white"/>
+                            </CustomButton>
+                            <CustomButton
+                                title="Delete"
+                                onPress={() => handleDeleteActivity(selectedDate, index)}
+                            >
+                                <IconTrash width="25" height="25" stroke="white"/>
+                            </CustomButton>
+                        </View>
                     </View>
                 ))}
                 </ScrollView>

@@ -3,13 +3,13 @@ import { StyleSheet } from "react-native"
 import { Text, View } from "react-native"
 import accentColor from "../assets/colorSchema"
 
-const CustomButton = ({onPress, title, style, children}) => {
+const CustomButton = ({onPress, title, style, textStyle, children}) => {
     return(
         <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
             {children ? (
                 <View>{children}</View>
             ) : (
-                <Text style={styles.text}>{title}</Text>
+                <Text style={[styles.text, textStyle]}>{title}</Text>
             )}
         </TouchableOpacity>
     )
@@ -17,7 +17,6 @@ const CustomButton = ({onPress, title, style, children}) => {
 
 const styles = StyleSheet.create({
     text: {
-        color: "black",
         alignSelf: "center",
         color: "white",
         fontSize: 16,

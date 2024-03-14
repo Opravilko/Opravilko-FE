@@ -5,21 +5,21 @@ const ProfileScreen = () => {
   const [name, setName] = useState('Đoni');
   const [surname, setSurname] = useState('Sosedov');
   const [nickname, setNickname] = useState('TAMALI PUBEC!');
-  const [avatarUrl, setAvatarUrl] = useState('https://thumbs.dreamstime.com/b/naughty-kid-21022824.jpg');
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   return (
     <View style={styles.container}>
-      <View style={styles.avatarContainer}>
-        <Image source={{ uri: avatarUrl }} style={styles.avatar} />
-        <Button title="Change Avatar" onPress={() => console.log('Change Avatar button pressed')} />
-      </View>
-      <Text style={styles.label}>Name:</Text>
-      <Text style={styles.value}>{name}</Text>
-      <Text style={styles.label}>Surname:</Text>
-      <Text style={styles.value}>{surname}</Text>
-      <Text style={styles.label}>Nickname:</Text>
-      <Text style={styles.value}>{nickname}</Text>
-      <Button title="Edit Profile" onPress={() => console.log('Edit Profile button pressed')} />
+        <View style={styles.avatarContainer}>
+            <Image source={require("../assets/temp_logo.png")} style={styles.avatar} />
+            <Button title="Change Avatar" onPress={() => console.log('Change Avatar button pressed')} />
+        </View>
+        <Text style={styles.label}>Name:</Text>
+        <Text style={styles.value}>{name}</Text>
+        <Text style={styles.label}>Surname:</Text>
+        <Text style={styles.value}>{surname}</Text>
+        <Text style={styles.label}>Nickname:</Text>
+        <Text style={styles.value}>{nickname}</Text>
+        <Button title="Edit Profile" onPress={() => console.log('Edit Profile button pressed')} />
     </View>
   );
 };

@@ -21,7 +21,7 @@ const Navbar = () => {
   const navigation = useNavigation();
 
   // get current screen/tab
-  const currentScreen = navigation.getCurrentRoute()?.name || "Home"
+  const currentScreen = navigation.getCurrentRoute()?.name || "Activities"
 
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10 }}>
@@ -31,8 +31,8 @@ const Navbar = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Messages')}>
             <IconMessages width={iconWidth} height={iconHeight} stroke={currentScreen == "Messages" ? activeColor : defaultColor}/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-            <IconTasks width={iconWidth} height={iconHeight} stroke={currentScreen == "Home" ? activeColor : defaultColor}/>
+        <TouchableOpacity onPress={() => navigation.navigate('Activities')}>
+            <IconTasks width={iconWidth} height={iconHeight} stroke={currentScreen == "Activities" ? activeColor : defaultColor}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Points')}>
             <IconPoints width={iconWidth} height={iconHeight} stroke={currentScreen == "Points" ? activeColor : defaultColor}/>

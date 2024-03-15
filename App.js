@@ -6,7 +6,7 @@ import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import MessagesScreen from './screens/MessagesScreen';
 import PointScreen from './screens/PointScreen';
-import LogInEditProfileScreen from './screens/Settings';
+import LogInEditProfileScreen from './screens/SettingsScreen';
 import Navbar from './components/Navbar';
 import LogInScreen from './screens/LogInScreen';
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -48,7 +48,7 @@ const App = () => {
                 <LogInScreen setUser={setUser}/>
             ) : (
                 <Tab.Navigator tabBar={(props) => <Navbar {...props} />}>
-                    <Tab.Screen name="Home" component={HomeScreen}/>
+                    <Tab.Screen name="Activities" component={HomeScreen}/>
                     <Tab.Screen name="Profile" component={ProfileScreen} />
                     <Tab.Screen name="Messages" component={MessagesScreen} />
                     <Tab.Screen name="Points" component={PointScreen} />

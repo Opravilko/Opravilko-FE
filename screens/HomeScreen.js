@@ -142,13 +142,14 @@ const HomeScreen = () => {
                                 <CustomButton
                                     title="complete"
                                     onPress={() => handleCompleteActivity(selectedDate, index)}
-                                    style={{ marginRight: 5, marginLeft: 5 }}
+                                    style={{ marginRight: 5, marginLeft: 5, backgroundColor: "#77DD77" }}
                                 >
                                     <IconThumbsup width="25" height="25" stroke="white"/>
                                 </CustomButton>
                                 <CustomButton
                                     title="Delete"
                                     onPress={() => handleDeleteActivity(selectedDate, index)}
+                                    style={{ backgroundColor: "#FF6961" }}
                                 >
                                     <IconTrash width="25" height="25" stroke="white"/>
                                 </CustomButton>

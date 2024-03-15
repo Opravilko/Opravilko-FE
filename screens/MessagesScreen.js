@@ -1,6 +1,8 @@
 // screens/MessagesScreen.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import Chat from '../components/messages/Chat';
+import Contacts from '../components/messages/Contacts';
+import { View, StyleSheet } from 'react-native';
 
 const messagesData = [
   { id: 1, name: 'John Doe', message: 'Hello there!' },
@@ -18,30 +20,8 @@ const MessagesScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.contactsColumn}>
-        <Text style={styles.header}>Contacts</Text>
-        <FlatList
-          data={messagesData}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePersonSelect(item)}>
-              <Text style={styles.contactName}>{item.name}</Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
-      <View style={styles.chatColumn}>
-        <Text style={styles.header}>Chat</Text>
-        {selectedPerson ? (
-          <View style={styles.chatArea}>
-            <Text>{selectedPerson.name}</Text>
-            <Text>{selectedPerson.message}</Text>
-            {/* Add more chat messages and input field as needed */}
-          </View>
-        ) : (
-          <Text style={styles.noChatText}>Select a person to start chatting</Text>
-        )}
-      </View>
+      <Contacts styles={styles} handlePersonSelect={handlePersonSelect} messagesData={messagesData} />
+      <Chat styles={styles} selectedPerson />
     </View>
   );
 };

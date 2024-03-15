@@ -4,14 +4,38 @@ import IconProfile from "../assets/icons/IconProfile";
 import IconLock from "../assets/icons/IconLock"
 import CustomButton from "../components/CustomButton";
 import { useState } from "react";
+import { useMutation, useQueryClient } from 'react-query';
+import { login } from "../api/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const LogInScreen = ({setUser}) => {
+const LogInScreen = ({navigation, setUser}) => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({mutationFn: login})
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
+    const storeToken = async(token) => {
+        try {
+            await AsyncStorage.setItem('token', "mojsecrettoken");
+        } catch (e) {
+            console.log("Failed to store token: " + e)
+        }
+    }
+
     const handleLogin = () => {
         // dev mode - always proceed to app
-        setUser("user")
+        mutation.mutateAsync({ username, password }, {
+            onSuccess: (data) => {
+                if(data.status == 200){
+                    storeToken(data.token)
+                    setUser("user") //go to home screen
+                }
+            },
+            onError: (err) => {
+                setUser("user") //testing, bypass failed auth
+                console.log("error")
+            }
+        })
     }
 
     const handleRegister = () => {
@@ -35,6 +59,11 @@ const LogInScreen = ({setUser}) => {
                     <Text style={{fontWeight: "bold", color: "#555" }}>Register Here</Text>
                 </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()}/>
                 <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()}/>
+                
+                {/* {mutation.isError &&
+                    <Text>ERROR</Text>
+                } */}
+
             </View>
         </ScrollView>
     )

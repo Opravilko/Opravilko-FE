@@ -1,29 +1,32 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, Button } from 'react-native';
-import { getProfile } from '../api/profile';
+import { getProfile } from '../api/user'
 import { useQuery, useQueryClient } from 'react-query';
 
 const ProfileScreen = () => {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: ['profile'], queryFn: getProfile })
-  
-  const [name, setName] = useState(query.data[0].name);
-  const [nickname, setNickname] = useState(query.data[0].address.city);
+  const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('https://thumbs.dreamstime.com/b/naughty-kid-21022824.jpg');
+  
+  const query = useQuery('profile', getProfile, {
+    onSuccess: (data) => {
+      setName(data[0].name)
+      setNickname(data[0].address.city)
+    }
+  })
 
   return (
     <View style={styles.container}>
-        <View style={styles.avatarContainer}>
-            <Image source={require("../assets/temp_logo.png")} style={styles.avatar} />
-            <Button title="Change Avatar" onPress={() => console.log('Change Avatar button pressed')} />
-        </View>
-        <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>{name}</Text>
-        <Text style={styles.label}>Surname:</Text>
-        <Text style={styles.value}>{surname}</Text>
-        <Text style={styles.label}>Nickname:</Text>
-        <Text style={styles.value}>{nickname}</Text>
-        <Button title="Edit Profile" onPress={() => console.log('Edit Profile button pressed')} />
+      <View style={styles.avatarContainer}>
+        <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+        <Button title="Change Avatar" onPress={() => console.log('Change Avatar button pressed')} />
+      </View>
+      <Text style={styles.label}>Name:</Text>
+      <Text style={styles.value}>{name}</Text>
+      <Text style={styles.label}>Nickname:</Text>
+      <Text style={styles.value}>{nickname}</Text>
+      <Button title="Edit Profile" onPress={() => console.log('Edit Profile button pressed')} />
     </View>
   );
 };

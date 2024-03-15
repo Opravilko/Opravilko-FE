@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, Button } from 'react-native';
-import { getProfile } from '../api/user';
+import { getProfile } from '../api/user'
 import { useQuery, useQueryClient } from 'react-query';
 
 const ProfileScreen = () => {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: ['profile'], queryFn: getProfile })
-  
-  const [name, setName] = useState(query.data[0].name);
-  const [nickname, setNickname] = useState(query.data[0].address.city);
+  const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('https://thumbs.dreamstime.com/b/naughty-kid-21022824.jpg');
+  
+  const query = useQuery('profile', getProfile, {
+    onSuccess: (data) => {
+      setName(data[0].name)
+      setNickname(data[0].address.city)
+    }
+  })
 
   return (
     <View style={styles.container}>

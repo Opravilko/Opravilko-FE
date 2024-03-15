@@ -6,6 +6,7 @@ import CustomButton from "../components/CustomButton";
 import { useState } from "react";
 import { useMutation, useQueryClient } from 'react-query';
 import { login } from "../api/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LogInScreen = ({navigation, setUser}) => {
     const queryClient = useQueryClient();
@@ -13,15 +14,25 @@ const LogInScreen = ({navigation, setUser}) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
+    const storeToken = async(token) => {
+        try {
+            await AsyncStorage.setItem('token', "mojsecrettoken");
+        } catch (e) {
+            console.log("Failed to store token: " + e)
+        }
+    }
+
     const handleLogin = () => {
         // dev mode - always proceed to app
-        mutation.mutateAsync({ username: "user", password: "secret"}, {
+        mutation.mutateAsync({ username, password }, {
             onSuccess: (data) => {
                 if(data.status == 200){
+                    storeToken(data.token)
                     setUser("user") //go to home screen
                 }
             },
             onError: (err) => {
+                setUser("user") //testing, bypass failed auth
                 console.log("error")
             }
         })

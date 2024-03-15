@@ -10,12 +10,24 @@ import LogInEditProfileScreen from './screens/Settings';
 import Navbar from './components/Navbar';
 import LogInScreen from './screens/LogInScreen';
 import { QueryClient, QueryClientProvider } from "react-query";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
 const queryClient = new QueryClient();
 
+
 const App = () => {
     const [user, setUser] = useState('')
+
+    const getToken = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          console.log("token: " + token)
+        } catch (e) {
+          console.log("Failed to get token from storage: " + e)
+          // error reading value
+        }
+      };
 
     useEffect(() => {
         // TODO

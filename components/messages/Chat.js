@@ -1,15 +1,20 @@
-import { View, Text } from "react-native";
+import { View, Text, FlatList } from "react-native";
 
-export default function Chat({ styles, selectedPerson }) {
+export default function Chat({ styles, messages }) {
+    console.log(messages)
     return (
         <View style={styles.chatColumn}>
             <Text style={styles.header}>Chat</Text>
-            {selectedPerson ? (
-                <View style={styles.chatArea}>
-                    <Text>{selectedPerson.name}</Text>
-                    <Text>{selectedPerson.message}</Text>
-                    {/* Add more chat messages and input field as needed */}
-                </View>
+            {messages && messages.length > 0 ? (
+                messages.map((item, i) => {
+                    return (
+                        <View style={styles.chatArea} key={i}>
+                            <Text>{item.user}</Text>
+                            <Text>{item.message}</Text>
+                        </View>
+                    )
+                })
+
             ) : (
                 <Text style={styles.noChatText}>Select a person to start chatting</Text>
             )}

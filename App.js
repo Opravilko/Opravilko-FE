@@ -31,6 +31,7 @@ const App = () => {
     }, [user])
 
     return (
+        <QueryClientProvider client={queryClient}>
         <NavigationContainer>
             {user === '' ? (
                 <LogInScreen setUser={setUser}/>
@@ -47,6 +48,7 @@ const App = () => {
             )}
             
         </NavigationContainer>
+        </QueryClientProvider>
     );
 };
 

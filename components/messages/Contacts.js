@@ -1,14 +1,14 @@
 import { View, Text, FlatList, TouchableOpacity } from "react-native"
 
-export default function Contacts({ styles, onPersonSelect, messagesData}) {
+export default function Contacts({ styles, onPersonSelect, users}) {
     return (
         <View style={styles.contactsColumn}>
             <Text style={styles.header}>Contacts</Text>
             <FlatList
-                data={messagesData}
+                data={users}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => onPersonSelect(item)}>
+                    <TouchableOpacity onPress={() => onPersonSelect(item.name)}>
                         <Text style={styles.contactName}>{item.name}</Text>
                     </TouchableOpacity>
                 )}

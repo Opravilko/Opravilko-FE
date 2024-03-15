@@ -1,23 +1,62 @@
 // screens/MessagesScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import Chat from '../components/messages/Chat';
 import Contacts from '../components/messages/Contacts';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Button } from 'react-native';
+import { useQuery, useQueryClient, useMutation} from 'react-query';
+import { getMessagesWith, sendMessage } from '../api/messages';
 
-const messagesData = [
-  { id: 1, name: 'John Doe', message: 'Hello there!' },
-  { id: 2, name: 'Jane Smith', message: 'How are you?' },
-  { id: 3, name: 'Alice Johnson', message: 'Good morning!' },
+const users = [
+  { id: 1, name: 'John Doe'},
+  { id: 2, name: 'Jane Smith'},
+  { id: 3, name: 'Alice Johnson'},
   // Add more message data as needed
 ];
 
 const MessagesScreen = () => {
+  const queryClient = useQueryClient();
+  const [messages, setMessages] = useState({});  
   const [selectedPerson, setSelectedPerson] = useState(null);
+  
+  const sendMessageMutation = useMutation({mutationFn: sendMessage});
+
+  const handleSendMessage = () => {
+    let message = "my message"
+    sendMessageMutation.mutateAsync({ selectedPerson, message}, {
+      onSuccess: (data) => {
+        if(data.status == 201){
+          console.log("Message sent successfully")
+        }
+      }
+    })
+  }
+
+  const messagesWithQuery = useQuery('messages', () => getMessagesWith(selectedPerson), {
+    onSuccess: (data) => {
+      setMessages(data)
+      console.log(messages)
+    },
+    refetchOnWindowFocus: false,
+    enabled: false
+  })
+
+
+  useEffect(() => {
+    if(selectedPerson != null){
+      messagesWithQuery.refetch()
+    }
+  }, [selectedPerson])
 
   return (
     <View style={styles.container}>
-      <Contacts styles={styles} onPersonSelect={setSelectedPerson} messagesData={messagesData} />
-      <Chat styles={styles} selectedPerson={selectedPerson} />
+      <Contacts styles={styles} onPersonSelect={setSelectedPerson} users={users} />
+      <Chat styles={styles} messages={messages} />
+
+      {/* <Button
+        onPress={handleSendMessage}
+        title="send msg"
+        color="#841584"
+      /> */}
     </View>
   );
 };

@@ -4,14 +4,27 @@ import IconProfile from "../assets/icons/IconProfile";
 import IconLock from "../assets/icons/IconLock"
 import CustomButton from "../components/CustomButton";
 import { useState } from "react";
+import { useMutation, useQueryClient } from 'react-query';
+import { login } from "../api/auth";
 
-const LogInScreen = ({setUser}) => {
+const LogInScreen = ({navigation, setUser}) => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({mutationFn: login})
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
     const handleLogin = () => {
         // dev mode - always proceed to app
-        setUser("user")
+        mutation.mutateAsync({ username: "user", password: "secret"}, {
+            onSuccess: (data) => {
+                if(data.status == 200){
+                    setUser("user") //go to home screen
+                }
+            },
+            onError: (err) => {
+                console.log("error")
+            }
+        })
     }
 
     const handleRegister = () => {
@@ -35,6 +48,11 @@ const LogInScreen = ({setUser}) => {
                     <Text style={{fontWeight: "bold", color: "#555" }}>Register Here</Text>
                 </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()}/>
                 <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()}/>
+                
+                {/* {mutation.isError &&
+                    <Text>ERROR</Text>
+                } */}
+
             </View>
         </ScrollView>
     )

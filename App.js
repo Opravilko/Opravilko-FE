@@ -9,8 +9,10 @@ import PointScreen from './screens/PointScreen';
 import LogInEditProfileScreen from './screens/Settings';
 import Navbar from './components/Navbar';
 import LogInScreen from './screens/LogInScreen';
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const Tab = createBottomTabNavigator();
+const queryClient = new QueryClient();
 
 const App = () => {
     const [user, setUser] = useState('')
@@ -24,6 +26,7 @@ const App = () => {
     }, [user])
 
     return (
+        <QueryClientProvider client={queryClient}>
         <NavigationContainer>
             {user === '' ? (
                 <LogInScreen setUser={setUser}/>
@@ -40,6 +43,7 @@ const App = () => {
             )}
             
         </NavigationContainer>
+        </QueryClientProvider>
     );
 };
 

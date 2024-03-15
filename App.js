@@ -10,11 +10,16 @@ import LogInEditProfileScreen from './screens/Settings';
 import Navbar from './components/Navbar';
 import LogInScreen from './screens/LogInScreen';
 import { QueryClient, QueryClientProvider } from "react-query";
+import { useFonts } from 'expo-font';
 
 const Tab = createBottomTabNavigator();
 const queryClient = new QueryClient();
 
 const App = () => {
+    const [fontsLoaded] = useFonts({
+        Rubik: require('./assets/fonts/Rubik-Regular.ttf'),
+    });
+
     const [user, setUser] = useState('')
 
     useEffect(() => {

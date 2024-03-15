@@ -1,47 +1,62 @@
 // screens/MessagesScreen.js
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect} from 'react';
+import Chat from '../components/messages/Chat';
+import Contacts from '../components/messages/Contacts';
+import { View, StyleSheet, Button } from 'react-native';
+import { useQuery, useQueryClient, useMutation} from 'react-query';
+import { getMessagesWith, sendMessage } from '../api/messages';
 
-const messagesData = [
-  { id: 1, name: 'John Doe', message: 'Hello there!' },
-  { id: 2, name: 'Jane Smith', message: 'How are you?' },
-  { id: 3, name: 'Alice Johnson', message: 'Good morning!' },
+const users = [
+  { id: 1, name: 'John Doe'},
+  { id: 2, name: 'Jane Smith'},
+  { id: 3, name: 'Alice Johnson'},
   // Add more message data as needed
 ];
 
 const MessagesScreen = () => {
+  const queryClient = useQueryClient();
+  const [messages, setMessages] = useState({});  
   const [selectedPerson, setSelectedPerson] = useState(null);
+  
+  const sendMessageMutation = useMutation({mutationFn: sendMessage});
 
-  const handlePersonSelect = (person) => {
-    setSelectedPerson(person);
-  };
+  const handleSendMessage = () => {
+    let message = "my message"
+    sendMessageMutation.mutateAsync({ selectedPerson, message}, {
+      onSuccess: (data) => {
+        if(data.status == 201){
+          console.log("Message sent successfully")
+        }
+      }
+    })
+  }
+
+  const messagesWithQuery = useQuery('messages', () => getMessagesWith(selectedPerson), {
+    onSuccess: (data) => {
+      setMessages(data)
+      console.log(messages)
+    },
+    refetchOnWindowFocus: false,
+    enabled: false
+  })
+
+
+  useEffect(() => {
+    if(selectedPerson != null){
+      messagesWithQuery.refetch()
+    }
+  }, [selectedPerson])
 
   return (
     <View style={styles.container}>
-      <View style={styles.contactsColumn}>
-        <Text style={styles.header}>Contacts</Text>
-        <FlatList
-          data={messagesData}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePersonSelect(item)}>
-              <Text style={styles.contactName}>{item.name}</Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
-      <View style={styles.chatColumn}>
-        <Text style={styles.header}>Chat</Text>
-        {selectedPerson ? (
-          <View style={styles.chatArea}>
-            <Text>{selectedPerson.name}</Text>
-            <Text>{selectedPerson.message}</Text>
-            {/* Add more chat messages and input field as needed */}
-          </View>
-        ) : (
-          <Text style={styles.noChatText}>Select a person to start chatting</Text>
-        )}
-      </View>
+      <Contacts styles={styles} onPersonSelect={setSelectedPerson} users={users} />
+      <Chat styles={styles} messages={messages} />
+
+      {/* <Button
+        onPress={handleSendMessage}
+        title="send msg"
+        color="#841584"
+      /> */}
     </View>
   );
 };

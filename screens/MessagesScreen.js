@@ -14,14 +14,10 @@ const messagesData = [
 const MessagesScreen = () => {
   const [selectedPerson, setSelectedPerson] = useState(null);
 
-  const handlePersonSelect = (person) => {
-    setSelectedPerson(person);
-  };
-
   return (
     <View style={styles.container}>
-      <Contacts styles={styles} handlePersonSelect={handlePersonSelect} messagesData={messagesData} />
-      <Chat styles={styles} selectedPerson />
+      <Contacts styles={styles} onPersonSelect={setSelectedPerson} messagesData={messagesData} />
+      <Chat styles={styles} selectedPerson={selectedPerson} />
     </View>
   );
 };

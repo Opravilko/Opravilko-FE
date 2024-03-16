@@ -52,7 +52,6 @@ const HomeScreen = () => {
 
         setSelectedDate(date.dateString);
         setSelectedDateDisplay(formattedDate);
-        console.log(date)
     };
 
     const handleAddActivity = () => {

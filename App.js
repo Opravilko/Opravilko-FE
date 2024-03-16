@@ -12,6 +12,7 @@ import LogInScreen from './screens/LogInScreen';
 import { QueryClient, QueryClientProvider } from "react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from 'expo-font';
+import ChatScreen from './screens/ChatScreen';
 
 const Tab = createBottomTabNavigator();
 const queryClient = new QueryClient();
@@ -50,11 +51,12 @@ const App = () => {
                 <Tab.Navigator tabBar={(props) => <Navbar {...props} />}>
                     <Tab.Screen name="Activities" component={HomeScreen}/>
                     <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
-                    <Tab.Screen name="Messages" component={MessagesScreen} />
+                    <Tab.Screen name="Messages" component={MessagesScreen} options={{ headerShown: false }}/>
                     <Tab.Screen name="Points" component={PointScreen} />
                     <Tab.Screen name="Settings">
                         {(props) => <LogInEditProfileScreen {...props} setUser={setUser} />}
                     </Tab.Screen>
+                    <Tab.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }}/>
                 </Tab.Navigator>
             )}
             

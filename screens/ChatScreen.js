@@ -1,12 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
 import CustomText from "../components/CustomText";
-import { FlatList, StyleSheet, TextInput, View } from "react-native";
+import { BackHandler, FlatList, StyleSheet, TextInput, View } from "react-native";
 import CustomButton from "../components/CustomButton";
 import ColorSchema from "../assets/ColorSchema";
 import IconBackArrow from "../assets/icons/IconBackArrow"
 import CustomInput from "../components/CustomInput";
 import IconSend from "../assets/icons/IconSend"
-import { useState } from "react";
+import { createRef, useEffect, useRef, useState } from "react";
 
 const users = [
     { id: 1, username: "john", name: 'John Doe', messages: [{username: "me", time: "16:35", message: "Hey, good to see you again"}, {username: "john", time: "16:37", message: "How's it going?"}] },
@@ -18,8 +18,23 @@ const ChatScreen = ({ route }) => {
     const [message, setMessage] = useState('');
     const navigation = useNavigation()
     const contactUsername = route.params.contact
+    let flatlistRef = createRef()
     
     const contact = users.find(user => user.username === contactUsername)
+
+    useEffect(() => {
+        const backAction = () => {
+            navigation.navigate("Messages")
+            return true
+        }
+
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction,
+        )
+
+        return () => backHandler.remove()
+    }, [])
 
     const handleBackButton = () => {
         navigation.navigate("Messages")
@@ -55,7 +70,9 @@ const ChatScreen = ({ route }) => {
                 <CustomText style={styles.header}>{ contact.name }</CustomText>
             </View>
             <View style={styles.messagesContainer}>
-                <FlatList 
+                <FlatList
+                    ref={ref => {this.flatListRef = ref}}
+                    onContentSizeChange={() => this.flatListRef.scrollToEnd()}
                     data={contact.messages}
                     renderItem={messageItem}
                 />

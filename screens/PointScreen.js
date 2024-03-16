@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, Image } from 'react-native';
 import CustomText from '../components/CustomText';
 import IconTrophy from '../assets/icons/IconTrophy'
-import accentColor from '../assets/colorSchema';
+import ColorSchema from '../assets/ColorSchema';
 
 const PointScreen = () => {
     const [points, setPoints] = useState([]);
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
     },
     firstScoreItem: {
-        backgroundColor: accentColor,
+        backgroundColor: ColorSchema.accentColor,
         paddingVertical: 40,
         marginHorizontal: 0,
         paddingHorizontal: 20,

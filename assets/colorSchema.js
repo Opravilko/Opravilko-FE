@@ -1,3 +1,6 @@
-const accentColor = "#01BAEF"
+const ColorSchema = {
+    accentColor: "#01BAEF",
+    accentColor2: "#058afa",
+}
 
-export default accentColor;
+export default ColorSchema

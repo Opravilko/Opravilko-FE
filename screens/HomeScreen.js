@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { View, Text, Button, TextInput, Alert, ScrollView, ToastAndroid } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import accentColor from '../assets/colorSchema';
 import CustomButton from '../components/CustomButton'
 import IconTrash from '../assets/icons/IconTrash';
 import IconThumbsup from '../assets/icons/IconThumbsup';
+import ColorSchema from '../assets/ColorSchema';
 
 
 LocaleConfig.locales['en'] = {
@@ -49,6 +49,7 @@ const HomeScreen = () => {
 
         setSelectedDate(date.dateString);
         setSelectedDateDisplay(formattedDate);
+        console.log(date)
     };
 
     const handleAddActivity = () => {
@@ -68,7 +69,7 @@ const HomeScreen = () => {
         setActivity('');
 
         // add dot on calendar
-        const newMarkedDates = { ...markedDates, [selectedDate]: { marked: true, dotColor: accentColor }}
+        const newMarkedDates = { ...markedDates, [selectedDate]: { marked: true, dotColor: ColorSchema.accentColor }}
         setMarkedDates(newMarkedDates);
     };
 
@@ -120,7 +121,7 @@ const HomeScreen = () => {
                     onDayPress={handleDateSelect}
                     markedDates={{
                         ...markedDates,
-                        [selectedDate]: { selected: true, marked: true, selectedColor: accentColor },
+                        [selectedDate]: { selected: true, marked: true, selectedColor: ColorSchema.accentColor },
                     }}
                 />
                 <Text style={{ marginTop: 20 }}>Selected Date: {selectedDateDisplay}</Text>

@@ -49,7 +49,7 @@ const App = () => {
             ) : (
                 <Tab.Navigator tabBar={(props) => <Navbar {...props} />}>
                     <Tab.Screen name="Activities" component={HomeScreen}/>
-                    <Tab.Screen name="Profile" component={ProfileScreen} />
+                    <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
                     <Tab.Screen name="Messages" component={MessagesScreen} />
                     <Tab.Screen name="Points" component={PointScreen} />
                     <Tab.Screen name="Settings">

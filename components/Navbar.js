@@ -8,14 +8,14 @@ import IconMessages from '../assets/icons/IconMessages';
 import IconTasks from '../assets/icons/IconTasks';
 import IconPoints from '../assets/icons/IconPoints';
 import IconProfile from '../assets/icons/IconProfile';
-import accentColor from '../assets/colorSchema';
+import ColorSchema from '../assets/ColorSchema';
 
 // icon dimensions
 const iconWidth = 32;
 const iconHeight = 32;
 // icon colors
 const defaultColor = "#000000";
-const activeColor = accentColor;
+const activeColor = ColorSchema.accentColor;
 
 const Navbar = () => {
   const navigation = useNavigation();

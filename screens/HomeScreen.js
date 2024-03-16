@@ -138,7 +138,7 @@ const HomeScreen = () => {
                             textStyle={{ fontSize: 18 }} />
 
                             <CustomButton title={"Cancel"} onPress={() => setModalVisible(false)}
-                            textStyle={{ fontSize: 18 }} />
+                            textStyle={{ fontSize: 18 }} style={{ backgroundColor: ColorSchema.accentColor2 }} />
                         </View>
                     </View>
                 </View>

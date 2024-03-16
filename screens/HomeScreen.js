@@ -1,11 +1,13 @@
 // screens/HomeScreen.js
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, Alert, ScrollView, ToastAndroid } from 'react-native';
+import { View, Text, Button, TextInput, Alert, ScrollView, ToastAndroid, StyleSheet, Modal } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import CustomButton from '../components/CustomButton'
 import IconTrash from '../assets/icons/IconTrash';
 import IconThumbsup from '../assets/icons/IconThumbsup';
 import ColorSchema from '../assets/ColorSchema';
+import CustomText from '../components/CustomText';
+import IconPlus from '../assets/icons/IconPlus';
 
 
 LocaleConfig.locales['en'] = {
@@ -43,6 +45,7 @@ const HomeScreen = () => {
     const [activity, setActivity] = useState('');
     const [activities, setActivities] = useState({});
     const [markedDates, setMarkedDates] = useState({})
+    const [modalVisible, setModalVisible] = useState(false)
 
     const handleDateSelect = (date) => {
         const formattedDate = `${date.day}. ${date.month}. ${date.year}`;
@@ -71,6 +74,7 @@ const HomeScreen = () => {
         // add dot on calendar
         const newMarkedDates = { ...markedDates, [selectedDate]: { marked: true, dotColor: ColorSchema.accentColor }}
         setMarkedDates(newMarkedDates);
+        setModalVisible(false)
     };
 
     const handleDeleteActivity = (date, index) => {
@@ -116,6 +120,29 @@ const HomeScreen = () => {
 
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
+            <Modal visible={modalVisible} transparent={true} animationType="fade">
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalWindow}>
+                        <CustomText style={styles.modalTitle}>Add an Activity</CustomText>
+                        
+                        <TextInput
+                            placeholder="Take out the trash"
+                            value={activity}
+                            onChangeText={setActivity}
+                            maxLength={30}
+                            style={ styles.input }
+                        />
+
+                        <View style={ styles.buttonsContainer }>
+                            <CustomButton title="Confirm" onPress={handleAddActivity}
+                            textStyle={{ fontSize: 18 }} />
+
+                            <CustomButton title={"Cancel"} onPress={() => setModalVisible(false)}
+                            textStyle={{ fontSize: 18 }} />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
             <View style={{ flex: 1, padding: 20, marginTop: 10 }}>
                 <Calendar
                     onDayPress={handleDateSelect}
@@ -123,19 +150,28 @@ const HomeScreen = () => {
                         ...markedDates,
                         [selectedDate]: { selected: true, marked: true, selectedColor: ColorSchema.accentColor },
                     }}
+                    style={ styles.calendar }
                 />
-                <Text style={{ marginTop: 20 }}>Selected Date: {selectedDateDisplay}</Text>
-                <TextInput
-                    placeholder="Take out the trash"
-                    value={activity}
-                    onChangeText={setActivity}
-                    maxLength={30}
-                    style={{ borderWidth: 1, borderColor: 'gray', padding: 10, marginTop: 10, borderRadius: 7, backgroundColor: "white" }}
-                />
-                <CustomButton title="Add Activity" onPress={handleAddActivity}/>
+                <View style={styles.newActivityContainer}>
+                    <CustomText style={ styles.activitiesTitle }>
+                        {activities[selectedDate] && selectedDate === todayDate() ? (
+                            "Activities for today"
+                        ) : activities[selectedDate] ? (
+                            "Activities on " + getDayOfWeek(selectedDate)
+                        ) : selectedDate === todayDate() ? (
+                            "No activities for today"
+                        ) : (
+                            "No activities on " + getDayOfWeek(selectedDate)
+                        )}
+                    </CustomText>
+                    <CustomButton style={styles.newButton} onPress={() => setModalVisible(true)}>
+                        <IconPlus width="35" height="35" stroke="white" />
+                    </CustomButton>
+                </View>
+                
+                
                 {activities[selectedDate] && (
                     <ScrollView style={{ marginTop: 20 }}>
-                    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Activities for {getDayOfWeek(selectedDate)}:</Text>
                     {activities[selectedDate].map((item, index) => (
                         <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
                             <Text>{item}</Text>
@@ -143,14 +179,14 @@ const HomeScreen = () => {
                                 <CustomButton
                                     title="complete"
                                     onPress={() => handleCompleteActivity(selectedDate, index)}
-                                    style={{ marginRight: 5, marginLeft: 5, backgroundColor: "#77DD77" }}
+                                    style={{ marginRight: 5, marginLeft: 5, backgroundColor: ColorSchema.accentColor }}
                                 >
                                     <IconThumbsup width="25" height="25" stroke="white"/>
                                 </CustomButton>
                                 <CustomButton
                                     title="Delete"
                                     onPress={() => handleDeleteActivity(selectedDate, index)}
-                                    style={{ backgroundColor: "#FF6961" }}
+                                    style={{ backgroundColor: ColorSchema.accentColor2 }}
                                 >
                                     <IconTrash width="25" height="25" stroke="white"/>
                                 </CustomButton>
@@ -164,5 +200,89 @@ const HomeScreen = () => {
         
     );
 };
+
+const styles = StyleSheet.create({
+    calendar: {
+        borderRadius: 5,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.43,
+        shadowRadius: 9.51,
+
+        elevation: 7,
+    },
+    newActivityContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginTop: 30,
+    },
+    activitiesTitle: {
+        color: "#555",
+        marginTop: 0,
+    },
+    newButton: {
+        backgroundColor: ColorSchema.accentColor2,
+        marginTop: 0,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 5,
+        },
+        shadowOpacity: 0.43,
+        shadowRadius: 9.51,
+
+        elevation: 9,
+    },
+    modalContainer: {
+        width: "100%",
+        height: "100%",
+        backgroundColor: "rgba(0,0,0,.3)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalWindow: {
+        alignItems: "center",
+        backgroundColor: "white",
+        width: "80%",
+        paddingVertical: 30,
+        paddingHorizontal: 10,
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 7,
+        },
+        shadowOpacity: 0.43,
+        shadowRadius: 9.51,
+
+        elevation: 15,
+    },
+    modalTitle: {
+        fontWeight: "bold",
+        borderBottomWidth: 1,
+        borderColor: "#ddd",
+        paddingBottom: 5,
+        marginBottom: 20,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: 'gray',
+        padding: 10,
+        marginTop: 10,
+        borderRadius: 7, 
+        backgroundColor: "white",
+        width: "80%",
+    },
+    buttonsContainer: {
+        marginTop: 30,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "80%",
+    },
+})
 
 export default HomeScreen;

@@ -16,7 +16,7 @@ const LogInScreen = ({navigation, setUser}) => {
 
     const storeToken = async(token) => {
         try {
-            await AsyncStorage.setItem('token', "mojsecrettoken");
+            await AsyncStorage.setItem('token', token);
         } catch (e) {
             console.log("Failed to store token: " + e)
         }
@@ -27,7 +27,7 @@ const LogInScreen = ({navigation, setUser}) => {
         mutation.mutateAsync({ username, password }, {
             onSuccess: (data) => {
                 if(data.status == 200){
-                    storeToken(data.token)
+                    storeToken(data.data.token)
                     setUser("user") //go to home screen
                 }
             },

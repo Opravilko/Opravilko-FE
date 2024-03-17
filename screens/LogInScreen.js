@@ -22,13 +22,23 @@ const LogInScreen = ({navigation, setUser}) => {
         }
     }
 
+    const storeUser = async(user) => {
+        try {
+            await AsyncStorage.setItem
+            ('user', JSON.stringify(user));
+        } catch (e) {
+            console.log("Failed to store user: " + e)
+        }
+    }
+
     const handleLogin = () => {
         // dev mode - always proceed to app
         mutation.mutateAsync({ username, password }, {
             onSuccess: (data) => {
                 if(data.status == 200){
                     storeToken(data.data.token)
-                    setUser("user") //go to home screen
+                    storeUser(data.user)
+                    setUser(data.user)
                 }
                 else {
                     ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
@@ -62,11 +72,6 @@ const LogInScreen = ({navigation, setUser}) => {
                     <Text style={{fontWeight: "bold", color: "#555" }}>Register</Text>
                 </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()}/>
                 <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()}/>
-                
-                {/* {mutation.isError &&
-                    <Text>ERROR</Text>
-                } */}
-
             </View>
         </ScrollView>
     )

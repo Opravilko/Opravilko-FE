@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import HomeScreen from './screens/HomeScreen'; 
+import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import MessagesScreen from './screens/MessagesScreen';
 import PointScreen from './screens/PointScreen';
@@ -27,50 +27,57 @@ const App = () => {
 
     const [user, setUser] = useState('')
 
-    const getToken = async () => {
-        try {
-          const token = await AsyncStorage.getItem('token');
-          console.log("token: " + token)
-        } catch (e) {
-          console.log("Failed to get token from storage: " + e)
-          // error reading value
-        }
-      };
-
+    // Just check if has already logged in before
     useEffect(() => {
-        // TODO
-        // get cookie from device and check if session is still active
-        // if not, go to login
-        //setUser("test")
-        console.log("goto login")
-    }, [user])
+        const checkUser = async () => {
+            try {
+                const user = await AsyncStorage.getItem('user');
+                if (user !== null) {
+                    setUser(user);
+                }
+            } catch (e) {
+                console.log("Error on getting user: " + e);
+            }
+        }
+        checkUser()
+    }, [])
 
     return (
         <QueryClientProvider client={queryClient}>
-        <NavigationContainer>
-            {user === '' ? (
-                <Stack.Navigator>
-                    <Stack.Screen name="LogIn">
-                        {(props) => <LogInScreen {...props} setUser={setUser} />}
-                    </Stack.Screen>
-                    <Stack.Screen name="Register">
-                        {(props) => <RegisterScreen {...props} setUser={setUser} />}
-                    </Stack.Screen>
-                </Stack.Navigator>
-            ) : (
-                <Tab.Navigator tabBar={(props) => <Navbar {...props} />}>
-                    <Tab.Screen name="Activities" component={HomeScreen}/>
-                    <Tab.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }}/>
-                    <Tab.Screen name="Messages" component={MessagesScreen} options={{ headerShown: false }}/>
-                    <Tab.Screen name="Points" component={PointScreen} />
-                    <Tab.Screen name="Settings">
-                        {(props) => <LogInEditProfileScreen {...props} setUser={setUser} />}
-                    </Tab.Screen>
-                    <Tab.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }}/>
-                </Tab.Navigator>
-            )}
-            
-        </NavigationContainer>
+            <NavigationContainer>
+                {user === '' ? (
+                    <Stack.Navigator>
+                        <Stack.Screen name="LogIn">
+                            {(props) => <LogInScreen {...props} setUser={setUser} />}
+                        </Stack.Screen>
+                        <Stack.Screen name="Register">
+                            {(props) => <RegisterScreen {...props} setUser={setUser} />}
+                        </Stack.Screen>
+                    </Stack.Navigator>
+                ) : (
+                    <Tab.Navigator tabBar={(props) => <Navbar {...props} />}>
+                        <Tab.Screen name="Activities">
+                            {(props) => <HomeScreen {...props} user={user} />}
+                        </Tab.Screen>
+                        <Tab.Screen name="Profile" options={{ headerShown: false }}>
+                            {(props) => <ProfileScreen {...props} user={user} />}
+                        </Tab.Screen>
+                        <Tab.Screen name="Messages" options={{ headerShown: false }} >
+                            {(props) => <MessagesScreen {...props} user={user} />}
+                        </Tab.Screen>
+                        <Tab.Screen name="Points">
+                            {(props) => <PointScreen {...props} user={user} />}
+                        </Tab.Screen>
+                        <Tab.Screen name="Settings">
+                            {(props) => <LogInEditProfileScreen {...props} setUser={setUser} />}
+                        </Tab.Screen>
+                        <Tab.Screen name="Chat" options={{ headerShown: false }} >
+                            {(props) => <ChatScreen {...props} user={user} />}
+                        </Tab.Screen>
+                    </Tab.Navigator>
+                )}
+
+            </NavigationContainer>
         </QueryClientProvider>
     );
 };

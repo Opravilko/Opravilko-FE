@@ -27,6 +27,15 @@ export default function RegisterScreen ({navigation, setUser}) {
         }
     }
 
+    const storeUser = async(user) => {
+        try {
+            await AsyncStorage.setItem
+            ('user', JSON.stringify(user));
+        } catch (e) {
+            console.log("Failed to store user: " + e)
+        }
+    }
+
     const handleLogin = () => {
         navigation.navigate("LogIn")
     }
@@ -53,7 +62,8 @@ export default function RegisterScreen ({navigation, setUser}) {
             onSuccess: (data) => {
                 if(data.status == 200){
                     storeToken(data.data.token)
-                    setUser("user") //go to home screen
+                    storeUser(data.user)
+                    setUser(data.user)
                 }
                 else {
                     ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
@@ -89,10 +99,6 @@ export default function RegisterScreen ({navigation, setUser}) {
                     <Text style={{fontWeight: "bold", color: "#555" }}>Login</Text>
                 </>} style={styles.register} textStyle={styles.registerText} onPress={handleLogin}/>
                 <CustomButton title={"REGISTER"} style={styles.login} textStyle={styles.loginText} onPress={handleRegister}/>
-                
-                {/* {mutation.isError &&
-                    <Text>ERROR</Text>
-                } */}
 
             </View>
         </ScrollView>

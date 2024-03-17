@@ -27,21 +27,6 @@ const App = () => {
 
     const [user, setUser] = useState({})
 
-    // Just check if has already logged in before
-    useEffect(() => {
-        const checkUser = async () => {
-            try {
-                const user = await AsyncStorage.getItem('user');
-                if (user !== null) {
-                    setUser(user);
-                }
-            } catch (e) {
-                console.log("Error on getting user: " + e);
-            }
-        }
-        checkUser()
-    }, [])
-
     return (
         <QueryClientProvider client={queryClient}>
             <NavigationContainer>

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import HomeScreen from './screens/HomeScreen'; 
 import ProfileScreen from './screens/ProfileScreen';
 import MessagesScreen from './screens/MessagesScreen';
@@ -13,8 +14,10 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from 'expo-font';
 import ChatScreen from './screens/ChatScreen';
+import RegisterScreen from './screens/RegisterScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -46,7 +49,14 @@ const App = () => {
         <QueryClientProvider client={queryClient}>
         <NavigationContainer>
             {user === '' ? (
-                <LogInScreen setUser={setUser}/>
+                <Stack.Navigator>
+                    <Stack.Screen name="LogIn">
+                        {(props) => <LogInScreen {...props} setUser={setUser} />}
+                    </Stack.Screen>
+                    <Stack.Screen name="Register">
+                        {(props) => <RegisterScreen {...props} setUser={setUser} />}
+                    </Stack.Screen>
+                </Stack.Navigator>
             ) : (
                 <Tab.Navigator tabBar={(props) => <Navbar {...props} />}>
                     <Tab.Screen name="Activities" component={HomeScreen}/>

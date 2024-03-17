@@ -7,4 +7,8 @@ export const login = async (user, setUser) => {
     return axios.post(`${URL}/login`, user);
 }
 
+export const register = async (user) => {
+    return axios.post(`${URL}/register`, user);
+}
+
 

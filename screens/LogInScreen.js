@@ -30,16 +30,19 @@ const LogInScreen = ({navigation, setUser}) => {
                     storeToken(data.data.token)
                     setUser("user") //go to home screen
                 }
+                else {
+                    ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
+                }
             },
             onError: (err) => {
-                setUser("user") //testing, bypass failed auth
-                console.log("error")
+                ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
+                console.log("Error on login: " + err);
             }
         })
     }
 
     const handleRegister = () => {
-        //TODO go to register screen
+        navigation.navigate("Register")
     }
 
     return (
@@ -56,7 +59,7 @@ const LogInScreen = ({navigation, setUser}) => {
                 </CustomInput>
                 <CustomButton title={<>
                     <Text>Don't have an account? </Text>
-                    <Text style={{fontWeight: "bold", color: "#555" }}>Register Here</Text>
+                    <Text style={{fontWeight: "bold", color: "#555" }}>Register</Text>
                 </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()}/>
                 <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()}/>
                 
@@ -73,7 +76,6 @@ const styles = StyleSheet.create({
     container: {
       alignItems: "center",
       padding: 20,
-      paddingTop: 130,
     },
     logo: {
         width: 170,

@@ -4,13 +4,15 @@ import Chat from '../components/messages/Chat';
 import Contacts from '../components/messages/Contacts';
 import { View, StyleSheet, Button, FlatList, Image } from 'react-native';
 import { useQuery, useQueryClient, useMutation} from 'react-query';
-import { getMessagesWith, sendMessage } from '../api/messages';
+import { sendMessage } from '../api/messages';
 import CustomButton from '../components/CustomButton';
 import { useNavigation } from '@react-navigation/native';
 import ColorSchema from '../assets/ColorSchema';
 import CustomText from '../components/CustomText';
+import { getUserList } from '../api/user';
+import { getUsername } from '../api/storageHelper';
 
-const users = [
+let users = [
     { id: 1, username: "john", name: 'John Doe', lastMessage: "How's it going?" },
     { id: 2, username: "jane", name: 'Jane Smith', lastMessage: "Did the mechanic say anything about that?"},
     { id: 3, username: "alice", name: 'Alice Johnson', lastMessage: "The reason I'm contacting you today is to ask about your car insurance" },
@@ -19,41 +21,22 @@ const users = [
 
 const MessagesScreen = () => {
     const queryClient = useQueryClient();
-    const [messages, setMessages] = useState({});  
+    const [messages, setMessages] = useState({});
+    const [users, setUsers] = useState([]);
+    const [username, setUsername] = useState(null)
     const [selectedPerson, setSelectedPerson] = useState(null);
-    
     const sendMessageMutation = useMutation({mutationFn: sendMessage});
+    const getUsersMutation = useMutation({mutationFn: getUserList});
     const navigation = useNavigation();
 
-    const handleSendMessage = () => {
-        let message = "my message"
-        sendMessageMutation.mutateAsync({ selectedPerson, message}, {
-            onSuccess: (data) => {
-                if(data.status == 201){
-                console.log("Message sent successfully")
-                }
-            }
-        })
-    }
-
-    const messagesWithQuery = useQuery('messages', () => getMessagesWith(selectedPerson), {
-        onSuccess: (data) => {
-            setMessages(data)
-            console.log(messages)
-        },
-        refetchOnWindowFocus: false,
-        enabled: false
-    })
-
     const openChat = (contact) => {
-        navigation.navigate("Chat", { contact })
+        console.log(contact)
+        navigation.navigate("Chat", { contact: contact })
     }
 
-    useEffect(() => {
-        if(selectedPerson != null){
-            messagesWithQuery.refetch()
-        }
-    }, [selectedPerson])
+    getUsername().then(username => {
+        setUsername(username)
+      });
 
     /*return (
         <View style={styles.container}>
@@ -67,9 +50,21 @@ const MessagesScreen = () => {
         /> }
         </View>
     )*/
+    useEffect(() => {
+        getUsersMutation.mutate({}, {
+            onSuccess: (data) => {
+                let users = data.data.map(user => ({...user, lastMessage: "Start chatting!"}))
+                users = users.filter((user) => {
+                    return user.name != username
+                })
+                console.log(users)
+                setUsers(users)
+            }
+        })
+    }, [])
 
     const contactItem = ({ item }) => (
-        <CustomButton onPress={() => openChat(item.username)} style={styles.contactItem}>
+        <CustomButton onPress={() => openChat(item.name)} style={styles.contactItem}>
             <View style={styles.contactItemInner}>
                 <Image source={require("../assets/temp_logo.png")} style={styles.avatar}/>
                 <View>

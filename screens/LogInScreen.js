@@ -17,6 +17,8 @@ const LogInScreen = ({navigation, setUser}) => {
     const storeToken = async(token) => {
         try {
             await AsyncStorage.setItem('token', token);
+            await AsyncStorage.setItem('username', username)
+            console.log("stored token: "+token)
         } catch (e) {
             console.log("Failed to store token: " + e)
         }

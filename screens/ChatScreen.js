@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import CustomText from "../components/CustomText";
 import { BackHandler, FlatList, StyleSheet, TextInput, View } from "react-native";
 import CustomButton from "../components/CustomButton";
@@ -7,6 +7,9 @@ import IconBackArrow from "../assets/icons/IconBackArrow"
 import CustomInput from "../components/CustomInput";
 import IconSend from "../assets/icons/IconSend"
 import { createRef, useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient, useMutation} from 'react-query';
+import { getMessagesWith, sendMessage } from "../api/messages";
+import { getUsername } from "../api/storageHelper";
 
 const users = [
     { id: 1, username: "john", name: 'John Doe', messages: [{username: "me", time: "16:35", message: "Hey, good to see you again"}, {username: "john", time: "16:37", message: "How's it going?"}] },
@@ -15,16 +18,37 @@ const users = [
 ]
 
 const ChatScreen = ({ route }) => {
+    const queryClient = useQueryClient();
     const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState([])
     const navigation = useNavigation()
     const contactUsername = route.params.contact
     let flatlistRef = createRef()
+    const [username, setUsername] = useState(null)
     
-    const contact = users.find(user => user.username === contactUsername)
+    // const contact = users.find(user => user.username === contactUsername)
+
+    const sendMessageMutation = useMutation({mutationFn: sendMessage});
+    const getMessagesWithMutation = useMutation({mutationFn: getMessagesWith});
+
+    getUsername().then(username => {
+        setUsername(username)
+      });
 
     useEffect(() => {
+        setMessages([])
+        getMessagesWithMutation.mutateAsync({ contactUsername }, {
+            onSuccess: (data) => {
+                console.log("Got messages")
+                setMessages(data.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)))
+            },
+            onError: (err) => {
+                console.log("Failed to get messages: "+err)
+            }
+        })
         const backAction = () => {
             navigation.navigate("Messages")
+
             return true
         }
 
@@ -34,20 +58,34 @@ const ChatScreen = ({ route }) => {
         )
 
         return () => backHandler.remove()
-    }, [])
+    }, [message, useIsFocused()])
 
     const handleBackButton = () => {
         navigation.navigate("Messages")
+        setMessages(null)
     }
 
     const handleSendMessage = () => {
-        contact.messages.push({username: "me", time: "12:00", message: message})
+        // contact.messages.push({username: "me", time: "12:00", message: message})
+        sendMessageMutation.mutateAsync({ contactUsername, message }, {
+            onSuccess: (data) => {
+                if(data.status == 201){
+                    console.log("Message sent successfully")
+                } else {
+                    console.log("Mission failed successfully: "+data.data)
+                }
+            },
+            onError: (err) => {
+                console.log("Failed to send message: " + err)
+            }
+        })
+
         setMessage("")
     }
 
     const messageItem = ({ item }) => (
         <>
-            { item.username === "me" ? (
+            { item.user === username ? (
                 <View style={[styles.message, styles.myMessage]}>
                     <CustomText style={[styles.messageContent, styles.myMessageContent]}>{ item.message }</CustomText>
                     <CustomText style={styles.messageTime}>{ item.time }</CustomText>
@@ -67,13 +105,13 @@ const ChatScreen = ({ route }) => {
                 <CustomButton style={ styles.backContainer } onPress={handleBackButton}>
                     <IconBackArrow width={50} height={50} stroke={"white"}/>
                 </CustomButton>
-                <CustomText style={styles.header}>{ contact.name }</CustomText>
+                <CustomText style={styles.header}>{ contactUsername }</CustomText>
             </View>
             <View style={styles.messagesContainer}>
                 <FlatList
                     ref={ref => {this.flatListRef = ref}}
                     onContentSizeChange={() => this.flatListRef.scrollToEnd()}
-                    data={contact.messages}
+                    data={messages}
                     renderItem={messageItem}
                 />
             </View>

@@ -1,27 +1,22 @@
 import axios from 'axios';
-import { axiosTokenConfig } from './axiosConfig';
+import { axiosTokenConfig, getToken } from './storageHelper';
 
 //TODO
-const URL = 'https://msgse.free.beeceptor.com'
+const URL = 'http://opravilko.germanywestcentral.azurecontainer.io:3000/api/message'
 
 // #/api/message/send
 // Posiljanje sporocil osebam
 
-export const sendMessage = async (user, messageToSend) => {
-    return axios.post(URL, {toUser: user, message: messageToSend}, axiosTokenConfig)
+export const sendMessage = async (userMessage) => {
+    let token = await getToken()
+    return axios.post(URL+"/send", {toUser: userMessage.contactUsername, message: userMessage.message, token: token})
 }
 
 // /api/message/with
-// Prikaz vseh sporocil z to vsebo
+// Prikaz vseh sporocil z to osebo
 export const getMessagesWith = async (user) => {
-    try {
-        const response = await axios.get(URL, axiosTokenConfig);
-        console.log("Fetching messages with user "+user)
-        return JSON.parse(response.data);
-    } catch (error) {
-        console.error("Error fetching messages", error);
-        throw error;
-    }
+    let token = await getToken()
+    return axios.post(URL+"/with", {user: user.contactUsername, token: token})
 }
 
 // #/api/message/delete

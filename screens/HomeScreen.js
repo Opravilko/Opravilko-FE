@@ -8,8 +8,6 @@ import IconThumbsup from '../assets/icons/IconThumbsup';
 import ColorSchema from '../assets/ColorSchema';
 import CustomText from '../components/CustomText';
 import IconPlus from '../assets/icons/IconPlus';
-import { addTask } from '../api/tasks';
-import { useMutation, useQueryClient } from 'react-query';
 
 
 LocaleConfig.locales['en'] = {
@@ -21,10 +19,7 @@ LocaleConfig.locales['en'] = {
 
 LocaleConfig.defaultLocale = 'en';
 
-const HomeScreen = ({ user }) => {
-    const queryClient = useQueryClient();
-    const addTaskMutation = useMutation({ mutationFn: addTask });
-
+const HomeScreen = () => {
     const todayDate = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -32,7 +27,7 @@ const HomeScreen = ({ user }) => {
         let day = today.getDate();
         month = month < 10 ? '0' + month : month;
         day = day < 10 ? '0' + day : day;
-
+        
         return `${year}-${month}-${day}`;
     };
 
@@ -47,9 +42,7 @@ const HomeScreen = ({ user }) => {
 
     const [selectedDate, setSelectedDate] = useState(todayDate());
     const [selectedDateDisplay, setSelectedDateDisplay] = useState(todayDateDisplay());
-    const [activity, setActivity] = useState({});
-    const [activityName, setActivityName] = useState('');
-    const [activityDescription, setActivityDescription] = useState('boring');
+    const [activity, setActivity] = useState('');
     const [activities, setActivities] = useState({});
     const [markedDates, setMarkedDates] = useState({})
     const [modalVisible, setModalVisible] = useState(false)
@@ -62,39 +55,10 @@ const HomeScreen = ({ user }) => {
     };
 
     const handleAddActivity = () => {
-        if (!selectedDate || !activityName) {
-            Alert.alert('Error', 'Please select a date and enter an activity.');
-            return;
+        if (!selectedDate || !activity) {
+           Alert.alert('Error', 'Please select a date and enter an activity.');
+           return;
         }
-
-        let req = {
-            taskName: activityName,
-            description: activityDescription,
-            start_date: selectedDate,
-            due_date: selectedDate,
-            users_assigned: [user._id],
-            user,
-            token: user.token
-        }
-
-        console.log(req)
-
-        addTaskMutation.mutateAsync(req, {
-            onSuccess: (res) => {
-                if (res.status == 201) {
-                    ToastAndroid.show("Activity added", ToastAndroid.SHORT)
-                }
-                else {
-                    ToastAndroid.show("Activity failed to add", ToastAndroid.SHORT)
-                }
-            },
-            onError: (err) => {
-                ToastAndroid.show("Activity failed to add", ToastAndroid.SHORT)
-                console.log("Error on activity add: " + err);
-            }
-        })
-
-        setActivity(req);
 
         const newActivities = { ...activities };
 
@@ -104,9 +68,10 @@ const HomeScreen = ({ user }) => {
 
         newActivities[selectedDate].push(activity);
         setActivities(newActivities);
-        setActivity({});
+        setActivity('');
 
-        const newMarkedDates = { ...markedDates, [selectedDate]: { marked: true, dotColor: ColorSchema.accentColor } }
+        // add dot on calendar
+        const newMarkedDates = { ...markedDates, [selectedDate]: { marked: true, dotColor: ColorSchema.accentColor }}
         setMarkedDates(newMarkedDates);
         setModalVisible(false)
     };
@@ -131,7 +96,7 @@ const HomeScreen = ({ user }) => {
         newActivities[date].splice(index, 1);
         if (newActivities[date].length === 0) {
             delete newActivities[date];
-
+            
             const newMarkedDates = { ...markedDates }
             delete newMarkedDates[date]
             setMarkedDates(newMarkedDates)
@@ -148,7 +113,7 @@ const HomeScreen = ({ user }) => {
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const date = new Date(dateString);
         const dayIndex = date.getDay();
-
+        
         return daysOfWeek[dayIndex];
     };
 
@@ -158,21 +123,21 @@ const HomeScreen = ({ user }) => {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalWindow}>
                         <CustomText style={styles.modalTitle}>Add an Activity</CustomText>
-
+                        
                         <TextInput
-                            placeholder="Name"
-                            value={activityName}
-                            onChangeText={setActivityName}
+                            placeholder="Take out the trash"
+                            value={activity}
+                            onChangeText={setActivity}
                             maxLength={30}
-                            style={styles.input}
+                            style={ styles.input }
                         />
 
-                        <View style={styles.buttonsContainer}>
+                        <View style={ styles.buttonsContainer }>
                             <CustomButton title="Confirm" onPress={handleAddActivity}
-                                textStyle={{ fontSize: 18 }} />
+                            textStyle={{ fontSize: 18 }} />
 
                             <CustomButton title={"Cancel"} onPress={() => setModalVisible(false)}
-                                textStyle={{ fontSize: 18 }} style={{ backgroundColor: ColorSchema.accentColor2 }} />
+                            textStyle={{ fontSize: 18 }} style={{ backgroundColor: ColorSchema.accentColor2 }} />
                         </View>
                     </View>
                 </View>
@@ -184,10 +149,10 @@ const HomeScreen = ({ user }) => {
                         ...markedDates,
                         [selectedDate]: { selected: true, marked: true, selectedColor: ColorSchema.accentColor },
                     }}
-                    style={styles.calendar}
+                    style={ styles.calendar }
                 />
                 <View style={styles.newActivityContainer}>
-                    <CustomText style={styles.activitiesTitle}>
+                    <CustomText style={ styles.activitiesTitle }>
                         {activities[selectedDate] && selectedDate === todayDate() ? (
                             "Activities for today"
                         ) : activities[selectedDate] ? (
@@ -202,36 +167,36 @@ const HomeScreen = ({ user }) => {
                         <IconPlus width="35" height="35" stroke="white" />
                     </CustomButton>
                 </View>
-
-
+                
+                
                 {activities[selectedDate] && (
                     <ScrollView style={{ marginTop: 20 }}>
-                        {activities[selectedDate].map((item, index) => (
-                            <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
-                                <Text>{item}</Text>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <CustomButton
-                                        title="complete"
-                                        onPress={() => handleCompleteActivity(selectedDate, index)}
-                                        style={{ marginRight: 5, marginLeft: 5, backgroundColor: ColorSchema.accentColor }}
-                                    >
-                                        <IconThumbsup width="25" height="25" stroke="white" />
-                                    </CustomButton>
-                                    <CustomButton
-                                        title="Delete"
-                                        onPress={() => handleDeleteActivity(selectedDate, index)}
-                                        style={{ backgroundColor: ColorSchema.accentColor2 }}
-                                    >
-                                        <IconTrash width="25" height="25" stroke="white" />
-                                    </CustomButton>
-                                </View>
+                    {activities[selectedDate].map((item, index) => (
+                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
+                            <Text>{item}</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <CustomButton
+                                    title="complete"
+                                    onPress={() => handleCompleteActivity(selectedDate, index)}
+                                    style={{ marginRight: 5, marginLeft: 5, backgroundColor: ColorSchema.accentColor }}
+                                >
+                                    <IconThumbsup width="25" height="25" stroke="white"/>
+                                </CustomButton>
+                                <CustomButton
+                                    title="Delete"
+                                    onPress={() => handleDeleteActivity(selectedDate, index)}
+                                    style={{ backgroundColor: ColorSchema.accentColor2 }}
+                                >
+                                    <IconTrash width="25" height="25" stroke="white"/>
+                                </CustomButton>
                             </View>
-                        ))}
+                        </View>
+                    ))}
                     </ScrollView>
                 )}
             </View>
         </ScrollView>
-
+        
     );
 };
 
@@ -307,7 +272,7 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         padding: 10,
         marginTop: 10,
-        borderRadius: 7,
+        borderRadius: 7, 
         backgroundColor: "white",
         width: "80%",
     },

@@ -8,13 +8,13 @@ import { useMutation, useQueryClient } from 'react-query';
 import { login } from "../api/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const LogInScreen = ({navigation, setUser}) => {
+const LogInScreen = ({ navigation, setUser }) => {
     const queryClient = useQueryClient();
-    const mutation = useMutation({mutationFn: login})
+    const mutation = useMutation({ mutationFn: login })
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    const storeToken = async(token) => {
+    const storeToken = async (token) => {
         try {
             await AsyncStorage.setItem('token', token);
         } catch (e) {
@@ -22,10 +22,10 @@ const LogInScreen = ({navigation, setUser}) => {
         }
     }
 
-    const storeUser = async(user) => {
+    const storeUser = async (user) => {
         try {
             await AsyncStorage.setItem
-            ('user', JSON.stringify(user));
+                ('user', JSON.stringify(user));
         } catch (e) {
             console.log("Failed to store user: " + e)
         }
@@ -34,11 +34,12 @@ const LogInScreen = ({navigation, setUser}) => {
     const handleLogin = () => {
         // dev mode - always proceed to app
         mutation.mutateAsync({ username, password }, {
-            onSuccess: (data) => {
-                if(data.status == 200){
-                    storeToken(data.data.token)
-                    storeUser(data.user)
-                    setUser(data.user)
+            onSuccess: (res) => {
+                if (res.status == 200) {
+                    storeToken(res.data.token)
+                    let userWithToken = {...res.data.user, token: res.data.token}
+                    storeUser(userWithToken)
+                    setUser(userWithToken)
                 }
                 else {
                     ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
@@ -58,9 +59,9 @@ const LogInScreen = ({navigation, setUser}) => {
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
             <View style={styles.container}>
-                <Image source={ require("../assets/temp_logo.png") } style={styles.logo} />
+                <Image source={require("../assets/temp_logo.png")} style={styles.logo} />
                 <Text style={styles.title} >SIGN IN</Text>
-                
+
                 <CustomInput placeholder={"Username"} value={username} setValue={setUsername}>
                     <IconProfile width="25" height="25" stroke="black" />
                 </CustomInput>
@@ -69,9 +70,9 @@ const LogInScreen = ({navigation, setUser}) => {
                 </CustomInput>
                 <CustomButton title={<>
                     <Text>Don't have an account? </Text>
-                    <Text style={{fontWeight: "bold", color: "#555" }}>Register</Text>
-                </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()}/>
-                <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()}/>
+                    <Text style={{ fontWeight: "bold", color: "#555" }}>Register</Text>
+                </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()} />
+                <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()} />
             </View>
         </ScrollView>
     )
@@ -79,8 +80,8 @@ const LogInScreen = ({navigation, setUser}) => {
 
 const styles = StyleSheet.create({
     container: {
-      alignItems: "center",
-      padding: 20,
+        alignItems: "center",
+        padding: 20,
     },
     logo: {
         width: 170,
@@ -111,6 +112,6 @@ const styles = StyleSheet.create({
     loginText: {
         fontSize: 20,
     },
-  });
+});
 
 export default LogInScreen

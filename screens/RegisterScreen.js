@@ -43,8 +43,8 @@ export default function RegisterScreen ({navigation, setUser}) {
 
     const handleRegister = () => {
         registerMutation.mutateAsync({ username, password, email, role }, {
-            onSuccess: (data) => {
-                if(data.status == 201){
+            onSuccess: (res) => {
+                if(res.status == 201){
                     console.log("Registered");
                     loginUserAfterRegister()
                 } else {
@@ -60,11 +60,12 @@ export default function RegisterScreen ({navigation, setUser}) {
 
     const loginUserAfterRegister = () => {
         loginMutation.mutateAsync({ username, password }, {
-            onSuccess: (data) => {
-                if(data.status == 200){
-                    storeToken(data.data.token)
-                    storeUser(data.user)
-                    setUser(data.user)
+            onSuccess: (res) => {
+                if(res.status == 200){
+                    storeToken(res.data.token)
+                    let userWithToken = {...res.data.user, token: res.data.token}
+                    storeUser(userWithToken)
+                    setUser(userWithToken)
                 }
                 else {
                     ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)

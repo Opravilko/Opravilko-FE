@@ -7,12 +7,13 @@ import IconMessages from "../assets/icons/IconMessages";
 import CustomButton from "../components/CustomButton";
 import { useState } from "react";
 import { useMutation, useQueryClient } from 'react-query';
-import { register } from "../api/auth";
+import { register, login } from "../api/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function RegisterScreen ({navigation, setUser}) {
     const queryClient = useQueryClient();
-    const mutation = useMutation({mutationFn: register})
+    const registerMutation = useMutation({mutationFn: register})
+    const loginMutation = useMutation({mutationFn: login})
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [email, setEmail] = useState('')
@@ -41,7 +42,7 @@ export default function RegisterScreen ({navigation, setUser}) {
     }
 
     const handleRegister = () => {
-        mutation.mutateAsync({ username, password, email, role }, {
+        registerMutation.mutateAsync({ username, password, email, role }, {
             onSuccess: (data) => {
                 if(data.status == 201){
                     console.log("Registered");
@@ -58,7 +59,7 @@ export default function RegisterScreen ({navigation, setUser}) {
     }
 
     const loginUserAfterRegister = () => {
-        mutation.mutateAsync({ username, password }, {
+        loginMutation.mutateAsync({ username, password }, {
             onSuccess: (data) => {
                 if(data.status == 200){
                     storeToken(data.data.token)

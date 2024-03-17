@@ -1,7 +1,5 @@
 // screens/MessagesScreen.js
 import React, { useState, useEffect} from 'react';
-import Chat from '../components/messages/Chat';
-import Contacts from '../components/messages/Contacts';
 import { View, StyleSheet, Button, FlatList, Image } from 'react-native';
 import { useQuery, useQueryClient, useMutation} from 'react-query';
 import { sendMessage } from '../api/messages';
@@ -11,13 +9,6 @@ import ColorSchema from '../assets/ColorSchema';
 import CustomText from '../components/CustomText';
 import { getUserList } from '../api/user';
 import { getUsername } from '../api/storageHelper';
-
-let users = [
-    { id: 1, username: "john", name: 'John Doe', lastMessage: "How's it going?" },
-    { id: 2, username: "jane", name: 'Jane Smith', lastMessage: "Did the mechanic say anything about that?"},
-    { id: 3, username: "alice", name: 'Alice Johnson', lastMessage: "The reason I'm contacting you today is to ask about your car insurance" },
-    // Add more message data as needed
-];
 
 const MessagesScreen = () => {
     const queryClient = useQueryClient();
@@ -66,7 +57,7 @@ const MessagesScreen = () => {
     const contactItem = ({ item }) => (
         <CustomButton onPress={() => openChat(item.name)} style={styles.contactItem}>
             <View style={styles.contactItemInner}>
-                <Image source={require("../assets/temp_logo.png")} style={styles.avatar}/>
+                <Image source={{ uri: `https://robohash.org/${item.name}` }} style={styles.avatar} />
                 <View>
                     <CustomText style={styles.contactName}>{ item.name }</CustomText>
                     <CustomText style={styles.contactMessage}>

@@ -30,7 +30,7 @@ const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <NavigationContainer>
-                {user === '' ? (
+                {Object.keys(user).length === 0 ? (
                     <Stack.Navigator>
                         <Stack.Screen name="LogIn">
                             {(props) => <LogInScreen {...props} setUser={setUser} />}

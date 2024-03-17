@@ -58,7 +58,7 @@ const LogInEditProfileScreen = ({ user, setUser }) => {
     };
 
     const handleLogout = async () => {
-        setUser('')
+        setUser({})
         await AsyncStorage.removeItem('user');
         await AsyncStorage.removeItem('token');
     }

@@ -25,7 +25,7 @@ const App = () => {
         Rubik: require('./assets/fonts/Rubik-Regular.ttf'),
     });
 
-    const [user, setUser] = useState('')
+    const [user, setUser] = useState({})
 
     // Just check if has already logged in before
     useEffect(() => {

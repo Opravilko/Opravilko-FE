@@ -8,13 +8,13 @@ import { useMutation, useQueryClient } from 'react-query';
 import { login } from "../api/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const LogInScreen = ({navigation, setUser}) => {
+const LogInScreen = ({ navigation, setUser }) => {
     const queryClient = useQueryClient();
-    const mutation = useMutation({mutationFn: login})
+    const mutation = useMutation({ mutationFn: login })
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
-    const storeToken = async(token) => {
+    const storeToken = async (token) => {
         try {
             await AsyncStorage.setItem('token', token);
             await AsyncStorage.setItem('username', username)
@@ -24,32 +24,46 @@ const LogInScreen = ({navigation, setUser}) => {
         }
     }
 
+    const storeUser = async (user) => {
+        try {
+            await AsyncStorage.setItem
+                ('user', JSON.stringify(user));
+        } catch (e) {
+            console.log("Failed to store user: " + e)
+        }
+    }
+
     const handleLogin = () => {
         // dev mode - always proceed to app
         mutation.mutateAsync({ username, password }, {
-            onSuccess: (data) => {
-                if(data.status == 200){
-                    storeToken(data.data.token)
-                    setUser("user") //go to home screen
+            onSuccess: (res) => {
+                if (res.status == 200) {
+                    storeToken(res.data.token)
+                    let userWithToken = {...res.data.user, token: res.data.token}
+                    storeUser(userWithToken)
+                    setUser(userWithToken)
+                }
+                else {
+                    ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
                 }
             },
             onError: (err) => {
-                setUser("user") //testing, bypass failed auth
-                console.log("error")
+                ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
+                console.log("Error on login: " + err);
             }
         })
     }
 
     const handleRegister = () => {
-        //TODO go to register screen
+        navigation.navigate("Register")
     }
 
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
             <View style={styles.container}>
-                <Image source={ require("../assets/temp_logo.png") } style={styles.logo} />
+                <Image source={require("../assets/logo.png")} style={styles.logo} />
                 <Text style={styles.title} >SIGN IN</Text>
-                
+
                 <CustomInput placeholder={"Username"} value={username} setValue={setUsername}>
                     <IconProfile width="25" height="25" stroke="black" />
                 </CustomInput>
@@ -58,14 +72,9 @@ const LogInScreen = ({navigation, setUser}) => {
                 </CustomInput>
                 <CustomButton title={<>
                     <Text>Don't have an account? </Text>
-                    <Text style={{fontWeight: "bold", color: "#555" }}>Register Here</Text>
-                </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()}/>
-                <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()}/>
-                
-                {/* {mutation.isError &&
-                    <Text>ERROR</Text>
-                } */}
-
+                    <Text style={{ fontWeight: "bold", color: "#555" }}>Register</Text>
+                </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()} />
+                <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()} />
             </View>
         </ScrollView>
     )
@@ -73,9 +82,8 @@ const LogInScreen = ({navigation, setUser}) => {
 
 const styles = StyleSheet.create({
     container: {
-      alignItems: "center",
-      padding: 20,
-      paddingTop: 130,
+        alignItems: "center",
+        padding: 20,
     },
     logo: {
         width: 170,
@@ -106,6 +114,6 @@ const styles = StyleSheet.create({
     loginText: {
         fontSize: 20,
     },
-  });
+});
 
 export default LogInScreen

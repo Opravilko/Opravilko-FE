@@ -1,19 +1,17 @@
 import axios from 'axios';
 import { axiosTokenConfig, getToken } from './storageHelper';
 
-const URL = "http://opravilko.germanywestcentral.azurecontainer.io:3000/api/user"
+const URL = 'http://opravilko.germanywestcentral.azurecontainer.io:3000/api';
 
-export const getProfile = async () => {
-    try {
-        const response = await axios.get('https://jsonplaceholder.typicode.com/users?id=1');
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching profile", error);
-        throw error;
-    }
+export const getUserTasks = async (req) => {
+    return axios.get(`${URL}/task/my`, req);
+}
+
+export const updateUser = async (user) => {
+    return axios.put(`${URL}/user/update`, user);
 }
 
 export const getUserList = async () => {
     let token = await getToken()
-    return axios.post(URL+"/list", {token: token})
+    return axios.post(`${URL}/user/list`, {token: token})
 }

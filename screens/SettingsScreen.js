@@ -1,54 +1,95 @@
 // SETTINGS
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, Image, Button } from 'react-native';
+import { View, TextInput, StyleSheet, Image, Button, ToastAndroid } from 'react-native';
 import CustomButton from '../components/CustomButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { updateUser } from '../api/user';
+import { useMutation, useQueryClient } from 'react-query';
 
-const LogInEditProfileScreen = ({ setUser }) => {
-    const [name, setName] = useState('');
-    const [surname, setSurname] = useState('');
-    const [nickname, setNickname] = useState('');
-    const [avatarUrl, setAvatarUrl] = useState('');
+const LogInEditProfileScreen = ({ user, setUser }) => {
+    const queryClient = useQueryClient();
+    const userMutation = useMutation({ mutationFn: updateUser });
+    const [email, setEmail] = useState(user.email);
+    const [nickname, setNickname] = useState(user.name);
+    const [role, setRole] = useState(user.role);
 
-    const handleSaveProfile = () => {
+    const handleSaveProfile = async () => {
         // Handle saving profile data to your backend or storage
-        console.log('Name:', name);
-        console.log('Surname:', surname);
-        console.log('Nickname:', nickname);
-        console.log('Avatar URL:', avatarUrl);
+        if (email === '' || nickname === '' || role === '') {
+            ToastAndroid.show('Please fill all fields', ToastAndroid.SHORT);
+            return;
+        };
+
+        let requestData = {
+            oldUsername: user.name, 
+            email: email,
+            name: nickname,
+            role: role,
+            token: user.token,
+        };
+
+        userMutation.mutateAsync(requestData, {
+            onSuccess: (res) => {
+                if (res.status == 200) {
+                    let newUser = {
+                        email: email,
+                        name: nickname,
+                        role: role,
+                        _id: user._id,
+                        pass: user.pass,
+                        token: user.token,
+                    };
+                    setUser(newUser);
+
+                    AsyncStorage.setItem('user', JSON.stringify(newUser));
+
+                    ToastAndroid.show("Profile saved", ToastAndroid.SHORT);
+                }
+                else {
+                    ToastAndroid.show("Failed to save profile", ToastAndroid.SHORT);
+                }
+            },
+            onError: (err) => {
+                ToastAndroid.show("Failed to save profile", ToastAndroid.SHORT);
+                console.log("Error on saving profile: " + err);
+            }
+        });
+
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setUser('')
+        await AsyncStorage.removeItem('user');
+        await AsyncStorage.removeItem('token');
     }
 
-  return (
-    <View style={styles.container}>
-        <View style={styles.avatarContainer}>
-            <Image source={require("../assets/temp_logo.png")} style={styles.avatar} />
-            <Button title="Change Avatar" onPress={() => console.log('Change Avatar button pressed')} />
+    return (
+        <View style={styles.container}>
+            <View style={styles.avatarContainer}>
+                <Image source={{ uri: `https://robohash.org/${user.name}` }} style={styles.avatar} />
+            </View>
+            <TextInput
+                placeholder="Nickname"
+                value={nickname}
+                onChangeText={setNickname}
+                style={styles.input}
+            />
+            <TextInput
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                style={styles.input}
+            />
+            <TextInput
+                placeholder="Role"
+                value={role}
+                onChangeText={setRole}
+                style={styles.input}
+            />
+            <Button title="Save Profile" onPress={handleSaveProfile} />
+            <CustomButton title={"LOGOUT"} onPress={() => handleLogout()} />
         </View>
-        <TextInput
-            placeholder="Name"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-        />
-        <TextInput
-            placeholder="Surname"
-            value={surname}
-            onChangeText={setSurname}
-            style={styles.input}
-        />
-        <TextInput
-            placeholder="Nickname"
-            value={nickname}
-            onChangeText={setNickname}
-            style={styles.input}
-        />
-        <Button title="Save Profile" onPress={handleSaveProfile} />
-        <CustomButton title={"LOGOUT"} onPress={() => handleLogout()}/>
-    </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({

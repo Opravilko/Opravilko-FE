@@ -21,7 +21,7 @@ const ProfileScreen = ({ user }) => {
 
             setCompletedActivities(data)
         }
-        
+
         fetchData()
     }, [])
 
@@ -36,8 +36,8 @@ const ProfileScreen = ({ user }) => {
     // TODO transform the date into EU format (and display day of week, if the date is less than 1 week away)
     const completedActivityItem = ({ item }) => (
         <View style={styles.completedActivityItem}>
-            <CustomText style={styles.activityDate}>{ item.date }</CustomText>
-            <CustomText style={styles.activityTitle}>{ item.title }</CustomText>
+            <CustomText style={styles.activityDate}>{item.date}</CustomText>
+            <CustomText style={styles.activityTitle}>{item.title}</CustomText>
         </View>
     )
 
@@ -50,26 +50,26 @@ const ProfileScreen = ({ user }) => {
                         <FlatList
                             data={completedActivities}
                             renderItem={completedActivityItem}
-                            style={{ width:"80%" }}
+                            style={{ width: "80%" }}
                         />
                         <CustomButton title={"Close"} onPress={() => setModalVisible(false)}
-                        textStyle={{ fontSize: 20 }} />
+                            textStyle={{ fontSize: 20 }} />
                     </View>
                 </View>
             </Modal>
             <View style={styles.backgroud}>
-                <CustomButton style={{backgroundColor: "transparent"}} onPress={handleEditProfile}>
+                <CustomButton style={{ backgroundColor: "transparent" }} onPress={handleEditProfile}>
                     <IconEditUser width="40" height="40" stroke="white" />
                 </CustomButton>
             </View>
             <View style={styles.contentContainer}>
                 <View style={styles.content}>
                     <View style={styles.avatarContainer}>
-                        <Image source={require("../assets/temp_logo.png")} style={styles.avatar} />
+                        <Image source={{ uri: `https://robohash.org/${user.name}` }} style={styles.avatar} />
                     </View>
                     <CustomText style={styles.nickname}>{user.name}</CustomText>
                     <CustomText style={styles.name}>{user.email}</CustomText>
-                    <CustomButton style={[{ backgroundColor: "transparent" },  styles.pointsContainer]} onPress={handleClickScore}>
+                    <CustomButton style={[{ backgroundColor: "transparent" }, styles.pointsContainer]} onPress={handleClickScore}>
                         <CustomText style={styles.pointsTitle}>Activities Completed</CustomText>
                         <CustomText style={styles.pointsValue}>{completedActivities.length}</CustomText>
                     </CustomButton>

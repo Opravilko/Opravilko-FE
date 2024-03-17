@@ -69,7 +69,7 @@ const App = () => {
                             {(props) => <PointScreen {...props} user={user} />}
                         </Tab.Screen>
                         <Tab.Screen name="Settings">
-                            {(props) => <LogInEditProfileScreen {...props} setUser={setUser} />}
+                            {(props) => <LogInEditProfileScreen {...props} setUser={setUser} user={user} />}
                         </Tab.Screen>
                         <Tab.Screen name="Chat" options={{ headerShown: false }} >
                             {(props) => <ChatScreen {...props} user={user} />}

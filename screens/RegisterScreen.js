@@ -81,7 +81,7 @@ export default function RegisterScreen ({navigation, setUser}) {
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
             <View style={styles.container}>
-                <Image source={ require("../assets/temp_logo.png") } style={styles.logo} />
+                <Image source={ require("../assets/logo.png") } style={styles.logo} />
                 <Text style={styles.title} >REGISTER</Text>
                 
                 <CustomInput placeholder={"Username"} value={username} setValue={setUsername}>

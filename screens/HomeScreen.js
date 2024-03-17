@@ -1,5 +1,5 @@
 // screens/HomeScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, Button, TextInput, Alert, ScrollView, ToastAndroid, StyleSheet, Modal } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import CustomButton from '../components/CustomButton'
@@ -8,7 +8,8 @@ import IconThumbsup from '../assets/icons/IconThumbsup';
 import ColorSchema from '../assets/ColorSchema';
 import CustomText from '../components/CustomText';
 import IconPlus from '../assets/icons/IconPlus';
-
+import { addTask, createNewTask, deleteTask, getAllTasks } from '../api/tasks';
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 
 LocaleConfig.locales['en'] = {
     monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -19,7 +20,11 @@ LocaleConfig.locales['en'] = {
 
 LocaleConfig.defaultLocale = 'en';
 
-const HomeScreen = () => {
+const HomeScreen = ({ user }) => {
+    const queryClient = useQueryClient();
+    const addTaskMutation = useMutation({mutationFn: addTask})
+    const getTasksMutation = useMutation({mutationFn: () => getAllTasks((user.token))})
+    const deleteTaskMutation = useMutation({mutationFn: deleteTask})
     const todayDate = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -44,8 +49,12 @@ const HomeScreen = () => {
     const [selectedDateDisplay, setSelectedDateDisplay] = useState(todayDateDisplay());
     const [activity, setActivity] = useState('');
     const [activities, setActivities] = useState({});
+    const [activityName, setActivityName] = useState('')
+    const [activityDescription, setActivityDescription] = useState('')
     const [markedDates, setMarkedDates] = useState({})
     const [modalVisible, setModalVisible] = useState(false)
+
+    const createNewTaskMutation = useMutation({mutationFn: createNewTask});
 
     const handleDateSelect = (date) => {
         const formattedDate = `${date.day}. ${date.month}. ${date.year}`;
@@ -55,11 +64,38 @@ const HomeScreen = () => {
     };
 
     const handleAddActivity = () => {
-        if (!selectedDate || !activity) {
+        if (!selectedDate || !activityName) {
            Alert.alert('Error', 'Please select a date and enter an activity.');
            return;
         }
 
+        let req = {
+            taskName: activityName,
+            description: activityDescription,
+            start_date: selectedDate,
+            due_date: selectedDate,
+            users_assigned: [user._id],
+            user,
+            token: user.token
+        }
+
+        addTaskMutation.mutateAsync(req, {
+            onSuccess: (res) => {
+                if (res.status == 201) {
+                    ToastAndroid.show("Activity added", ToastAndroid.SHORT)
+                }
+                else {
+                    ToastAndroid.show("Activity failed to add", ToastAndroid.SHORT)
+                }
+            },
+            onError: (err) => {
+                ToastAndroid.show("Activity failed to add", ToastAndroid.SHORT)
+                console.log("Error on activity add: " + err);
+            }
+        
+        })
+
+        setActivity(req);
         const newActivities = { ...activities };
 
         if (!newActivities[selectedDate]) {
@@ -67,8 +103,11 @@ const HomeScreen = () => {
         }
 
         newActivities[selectedDate].push(activity);
+        
+        //
         setActivities(newActivities);
-        setActivity('');
+        setActivity({});
+
 
         // add dot on calendar
         const newMarkedDates = { ...markedDates, [selectedDate]: { marked: true, dotColor: ColorSchema.accentColor }}
@@ -87,6 +126,23 @@ const HomeScreen = () => {
             setMarkedDates(newMarkedDates)
         }
         setActivities(newActivities);
+
+        const req = {
+            "taskId": activities[date][index]._id,
+            "token": user.token
+        }
+
+        console.log(req)
+
+        deleteTaskMutation.mutateAsync(req, {
+            onSuccess: (res) => {
+                console.log(res.status)
+                console.log("Deleted task")
+            },
+            onError: (err) => {
+                console.log("Failed to delete task: " + err)
+            }
+        })
 
         ToastAndroid.show("Activity deleted", ToastAndroid.SHORT)
     };
@@ -117,6 +173,18 @@ const HomeScreen = () => {
         return daysOfWeek[dayIndex];
     };
 
+    useEffect(() => {
+        getTasksMutation.mutateAsync({}, {
+            onSuccess: (res) => {
+                console.log("Fetched all list items")
+                const newActivities = { ...activities };
+                newActivities[selectedDate] = res.data;
+                newActivities[selectedDate] = newActivities[selectedDate].filter(item => item.author === user._id)
+                setActivities(newActivities);
+            }
+        })
+    }, [])
+
     return (
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
             <Modal visible={modalVisible} transparent={true} animationType="fade">
@@ -125,9 +193,9 @@ const HomeScreen = () => {
                         <CustomText style={styles.modalTitle}>Add an Activity</CustomText>
                         
                         <TextInput
-                            placeholder="Take out the trash"
-                            value={activity}
-                            onChangeText={setActivity}
+                            placeholder="Name"
+                            value={activityName}
+                            onChangeText={setActivityName}
                             maxLength={30}
                             style={ styles.input }
                         />
@@ -168,12 +236,11 @@ const HomeScreen = () => {
                     </CustomButton>
                 </View>
                 
-                
                 {activities[selectedDate] && (
                     <ScrollView style={{ marginTop: 20 }}>
                     {activities[selectedDate].map((item, index) => (
                         <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'space-between' }}>
-                            <Text>{item}</Text>
+                            <Text>{item.name}</Text>
                             <View style={{ flexDirection: 'row' }}>
                                 <CustomButton
                                     title="complete"

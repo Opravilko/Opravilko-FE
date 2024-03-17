@@ -16,7 +16,6 @@ const MessagesScreen = () => {
     const [users, setUsers] = useState([]);
     const [username, setUsername] = useState(null)
     const [selectedPerson, setSelectedPerson] = useState(null);
-    const sendMessageMutation = useMutation({mutationFn: sendMessage});
     const getUsersMutation = useMutation({mutationFn: getUserList});
     const navigation = useNavigation();
 
@@ -29,18 +28,6 @@ const MessagesScreen = () => {
         setUsername(username)
       });
 
-    /*return (
-        <View style={styles.container}>
-        <Contacts styles={styles} onPersonSelect={setSelectedPerson} users={users} />
-        <Chat styles={styles} messages={messages} />
-
-        { <Button
-            onPress={handleSendMessage}
-            title="send msg"
-            color="#841584"
-        /> }
-        </View>
-    )*/
     useEffect(() => {
         getUsersMutation.mutate({}, {
             onSuccess: (data) => {

@@ -22,24 +22,37 @@ const LogInScreen = ({navigation, setUser}) => {
         }
     }
 
+    const storeUser = async(user) => {
+        try {
+            await AsyncStorage.setItem
+            ('user', JSON.stringify(user));
+        } catch (e) {
+            console.log("Failed to store user: " + e)
+        }
+    }
+
     const handleLogin = () => {
         // dev mode - always proceed to app
         mutation.mutateAsync({ username, password }, {
             onSuccess: (data) => {
                 if(data.status == 200){
                     storeToken(data.data.token)
-                    setUser("user") //go to home screen
+                    storeUser(data.user)
+                    setUser(data.user)
+                }
+                else {
+                    ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
                 }
             },
             onError: (err) => {
-                setUser("user") //testing, bypass failed auth
-                console.log("error")
+                ToastAndroid.show("Login failed, please try again", ToastAndroid.SHORT)
+                console.log("Error on login: " + err);
             }
         })
     }
 
     const handleRegister = () => {
-        //TODO go to register screen
+        navigation.navigate("Register")
     }
 
     return (
@@ -56,14 +69,9 @@ const LogInScreen = ({navigation, setUser}) => {
                 </CustomInput>
                 <CustomButton title={<>
                     <Text>Don't have an account? </Text>
-                    <Text style={{fontWeight: "bold", color: "#555" }}>Register Here</Text>
+                    <Text style={{fontWeight: "bold", color: "#555" }}>Register</Text>
                 </>} style={styles.register} textStyle={styles.registerText} onPress={() => handleRegister()}/>
                 <CustomButton title={"LOGIN"} style={styles.login} textStyle={styles.loginText} onPress={() => handleLogin()}/>
-                
-                {/* {mutation.isError &&
-                    <Text>ERROR</Text>
-                } */}
-
             </View>
         </ScrollView>
     )
@@ -73,7 +81,6 @@ const styles = StyleSheet.create({
     container: {
       alignItems: "center",
       padding: 20,
-      paddingTop: 130,
     },
     logo: {
         width: 170,
